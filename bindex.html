@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacts</title>
+</head>
+<body>
+    <div>
+        <h1>Contacts</h1>
+    </div>
+    <div id="display"></div>
+
+    <!-- Form to add a new person -->
+    <div>
+        <h3>Add a new person:</h3>
+        <form id="addPersonForm">
+            Name: <input type="text" id="name" required><br>
+            Age: <input type="number" id="age" required><br>
+            <button type="submit">Add Person</button>
+        </form>
+    </div>
+
+    <script>
+        const SERVER = "http://127.0.0.1:5000";
+
+        // Fetch and display the people list
+        axios(SERVER + "/hello").then(res => {
+            const people = res.data;
+            let output = '';
+            
+            // Loop through each person and append their name and age
+            people.forEach(person => {
+                output += `Name: ${person.name}, Age: ${person.age} <br>`;
+            });
+
+            document.getElementById("display").innerHTML = output;
+        });
+
+        // Handle form submission to add a new person
+        const form = document.getElementById('addPersonForm');
+        form.addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent page reload
+
+            // Get the values from the form
+            const name = document.getElementById('name').value;
+            const age = document.getElementById('age').value;
+
+            // Send a POST request to add the person
+            axios.post(SERVER + "/add_person", {
+                name: name,
+                age: age
+            }).then(response => {
+                alert(response.data.message);
+                // Optionally reload the list of people
+                location.reload(); // Simple page reload to fetch updated data
+            }).catch(error => {
+                alert(error.response.data.error);
+            });
+        });
+    </script>
+</body>
+</html>
